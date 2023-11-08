@@ -10,7 +10,7 @@ module.exports = {
   settings: { react: { version: "18.2" } },
   plugins: ["react-refresh"],
   rules: {
-    "react-refresh/only-export-components": "warn",
+    "react-refresh/only-export-components": "off", //关闭热重载警告
     "react/prop-types": 0, //忽略props验证
     "no-unused-vars": "warn", //未使用从error警告改为warning
   },
