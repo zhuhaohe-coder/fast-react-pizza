@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Form, redirect, useActionData, useNavigation } from 'react-router-dom';
-import { createOrder } from '../../services/apiRestaurant';
-import Button from '../../ui/Button';
-import { useSelector } from 'react-redux';
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { createOrder } from "../../services/apiRestaurant";
+import Button from "../../ui/Button";
+import { useSelector } from "react-redux";
+import { getCart } from "../cart/cartSlice";
+import EmptyCart from "../cart/EmptyCart";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -10,37 +11,15 @@ const isValidPhone = (str) =>
     str,
   );
 
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: 'Mediterranean',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: 'Vegetale',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: 'Spinach and Mushroom',
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
-
 function CreateOrder() {
   // const [withPriority, setWithPriority] = useState(false);
-  const cart = fakeCart;
+  const cart = useSelector(getCart);
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
+  const isSubmitting = navigation.state === "submitting";
   const formErrors = useActionData();
   const username = useSelector((store) => store.user.username);
+
+  if (!cart.length) return <EmptyCart />;
 
   return (
     <div className="px-4 py-6">
@@ -98,7 +77,7 @@ function CreateOrder() {
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button type="primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Placing Order...' : 'Order now'}
+            {isSubmitting ? "Placing Order..." : "Order now"}
           </Button>
         </div>
       </Form>
@@ -113,14 +92,14 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === 'on',
+    priority: data.priority === "on",
   };
 
   const error = {};
 
   if (!isValidPhone(order.phone))
     error.phone =
-      'Please give us your correct phone number.We might need it to contact you.';
+      "Please give us your correct phone number.We might need it to contact you.";
 
   if (Object.keys(error).length > 0) return error;
   const newOrder = await createOrder(order);
